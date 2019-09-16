@@ -1,0 +1,62 @@
+<form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+<mat-card>
+        <mat-card-header>
+            
+                        <div mat-card-avatar class="image-avatar" [matMenuTriggerFor]="menu">
+                        </div>
+                        <mat-menu #menu="matMenu">
+                          <label mat-menu-item for="pictureupload" ><input type="file" #file (change)="onselect()" [hidden] = "true" id="pictureupload" formControlName="pic" >Upload</label>
+
+                          <button mat-menu-item>Get from <i class="fas fa-instagram "></i></button>
+                        </mat-menu>
+                        
+                <mat-card-title>Add new Design</mat-card-title>
+                <mat-card-subtitle>What's on your mind?</mat-card-subtitle>
+              </mat-card-header>
+              <div>
+                <div *ngFor="let picture of pictures; let i = index" >
+                  <img  [src]="base64[i]"/>
+                </div>
+              </div>
+              <mat-card-content>
+<mat-form-field>
+    <input matInput formControlName="designTitle" placeholder="Fashion Title">
+  </mat-form-field>
+  <br>
+  <mat-form-field>
+    <input matInput formControlName="designDescription" placeholder="What design is on your mind?">
+  </mat-form-field>
+  <br>
+  <mat-form-field class="example-chip-list">
+    <mat-chip-list #chipList aria-label="Fruit selection">
+      <mat-chip
+        *ngFor="let fruit of fruits"
+        [selectable]="selectable"
+        [removable]="removable"
+        (removed)="remove(fruit)">
+        {{fruit}}
+        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+      </mat-chip>
+      <input
+        placeholder="Tags..."
+        #fruitInput
+        formControlName = 'tagsvalue'
+        [matAutocomplete]="auto"
+        [matChipInputFor]="chipList"
+        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        [matChipInputAddOnBlur]="addOnBlur"
+        (matChipInputTokenEnd)="add($event)">
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+      <mat-option *ngFor="let fruit of filteredFruits | async" [value]="fruit">
+        {{fruit}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</mat-card-content>
+<mat-card-actions>
+        <button mat-button>Cancel</button>
+        <button type="submit" [disabled]="!profileForm.valid" mat-button>Save</button>
+      </mat-card-actions>
+</mat-card>
+</form>

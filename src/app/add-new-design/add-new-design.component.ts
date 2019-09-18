@@ -17,12 +17,21 @@ import {map, startWith} from 'rxjs/operators';
 export class AddNewDesignComponent implements OnInit {
   @ViewChild('file', {static: false}) file: ElementRef<HTMLInputElement>;
   public value: string[];
+  Genders: Gender[] = [
+    {value: 'unisex', viewValue: 'Unisex'},
+    {value: 'male', viewValue: 'Male'},
+    {value: 'female', viewValue: 'Female'}
+  ];
   fruits: string[] = ['Lemon', 'Lime'];
-  profileForm = this.fb.group({
+  fabrics: string[] = ['Lemon', 'Lime'];
+  firstForm = this.fb.group({
     designTitle: ['', Validators.required],
     designDescription: ['', Validators.required],
     pic: ['', Validators.required],
-    tagsvalue: ['', Validators.required, ValidateChips(this.fruits)]
+  });
+  secondForm = this.fb.group({
+    tagsvalue: [''],
+    fabricsvalue: ['']
   });
   pictures = [];
   base64 = [];
@@ -33,19 +42,26 @@ export class AddNewDesignComponent implements OnInit {
   addOnBlur = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
   filteredFruits: Observable<string[]>;
+  filteredFabrics: Observable<string[]>;
   allFruits: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+  allFabrics: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
 
   @ViewChild('fruitInput', {static: false}) fruitInput: ElementRef<HTMLInputElement>;
+  @ViewChild('fabricInput', {static: false}) fabricInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto', {static: false}) matAutocomplete: MatAutocomplete;
+  @ViewChild('autoFabric', {static: false}) matAutocompleteFabric: MatAutocomplete;
   constructor(private fb: FormBuilder) {
-    this.filteredFruits = this.profileForm.get('tagsvalue').valueChanges.pipe(
+    this.filteredFruits = this.secondForm.get('tagsvalue').valueChanges.pipe(
       startWith(null),
       map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFruits.slice()));
+    this.filteredFabrics = this.secondForm.get('fabricsvalue').valueChanges.pipe(
+        startWith(null),
+        map((fabric: string | null) => fabric ? this._filter(fabric) : this.allFabrics.slice()));
    }
 
   onSubmit() {
-    this.profileForm.value.pictures = this.pictures;
-    console.log(this.profileForm.value);
+    this.firstForm.value.pictures = this.pictures;
+    console.log(this.firstForm.value);
   }
 
   onselect() {
@@ -84,7 +100,28 @@ export class AddNewDesignComponent implements OnInit {
         input.value = '';
       }
 
-      this.profileForm.get('tagsvalue').setValue(null);
+      this.secondForm.get('tagsvalue').setValue(null);
+    }
+  }
+
+  addFabric(event: MatChipInputEvent): void {
+    // Add fruit only when MatAutocomplete is not open
+    // To make sure this does not conflict with OptionSelected Event
+    if (!this.matAutocompleteFabric.isOpen) {
+      const input = event.input;
+      const value = event.value;
+
+      // Add our fruit
+      if ((value || '').trim()) {
+        this.fruits.push(value.trim());
+      }
+
+      // Reset the input value
+      if (input) {
+        input.value = '';
+      }
+
+      this.secondForm.get('fabricsvalue').setValue(null);
     }
   }
 
@@ -96,10 +133,24 @@ export class AddNewDesignComponent implements OnInit {
     }
   }
 
+  removeFabric(fabric: string): void {
+    const index = this.fabrics.indexOf(fabric);
+
+    if (index >= 0) {
+      this.fabrics.splice(index, 1);
+    }
+  }
+
   selected(event: MatAutocompleteSelectedEvent): void {
     this.fruits.push(event.option.viewValue);
     this.fruitInput.nativeElement.value = '';
-    this.profileForm.get('tagsvalue').setValue(null);
+    this.secondForm.get('tagsvalue').setValue(null);
+  }
+
+  selectedFabric(event: MatAutocompleteSelectedEvent): void {
+    this.fabrics.push(event.option.viewValue);
+    this.fabricInput.nativeElement.value = '';
+    this.secondForm.get('fabricsvalue').setValue(null);
   }
 
   private _filter(value: string): string[] {
@@ -117,4 +168,9 @@ export function ValidateChips(tags: Array<string>): ValidatorFn {
   return (control: AbstractControl): {[key: string]: any} | null => {
     return tags.length > 0 ? {ValidateChips: {value: tags}} : null;
   };
+}
+
+export interface Gender {
+  value: string;
+  viewValue: string;
 }

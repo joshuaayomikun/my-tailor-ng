@@ -7,6 +7,7 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
 @NgModule({
     exports: [
         MatStepperModule,
@@ -16,7 +17,8 @@ import {MatIconModule} from '@angular/material/icon';
         MatMenuModule,
         MatChipsModule,
         MatAutocompleteModule,
-        MatIconModule
+        MatIconModule,
+        MatSelectModule
     ]
 })
 
